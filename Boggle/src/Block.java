@@ -19,7 +19,7 @@ class Block {
 			return neighbors;
 		}
 		
-		private Object getLetter() {
+		public char getLetter() {
 			return letter;
 		}
 

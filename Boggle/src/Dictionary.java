@@ -1,47 +1,71 @@
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public class Dictionary {
 	
-	Set<String> words;
+	DictionaryNode root;
 	
 	public Dictionary() {
-		words = new HashSet<String>();
-		words.add("hi");
-		words.add("hello");
-		words.add("grab");
-	}
-	
-	
-	public boolean isWord(String w) {
-		if (w.equals("hi") || w.equals("hello")
-				|| w.equals("grab")) {
-			return true;
+		// Empty root node, has 26 children
+		root = new DictionaryNode();
+		
+		System.out.println("Getting all the words");
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader("/usr/share/dict/words"));
+			String word;
+			while((word = reader.readLine()) != null) {
+				this.add(word);
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return false;
+		
 	}
 	
-	public boolean isPrefix(String w) {
-		// TODO
-		if (w.equals("h") || w.equals("he") || w.equals("hel") || w.equals("hell")
-				|| w.equals("g") || w.equals("gr") || w.equals("gra")) {
-			System.out.println("Valid prefix? " + w + ": TRUE");
-			return true;
+	private void add(String word) {
+		DictionaryNode currentNode = root;
+		for (int i = 0; i < word.length(); i++) {
+			char currentChar = word.charAt(i);
+			DictionaryNode nextNode;
+			
+			// If char not in tree at current position, create it
+			if (!currentNode.getChildren().containsKey(currentChar)) {
+				nextNode = new DictionaryNode(currentChar);
+				currentNode.addChild(currentChar);
+			} else {
+				nextNode = currentNode.getChildren().get(currentChar);
+			}
+			
+			// Traverse
+			currentNode = nextNode;
 		}
-		System.out.println("Valid prefix? " + w + ": FALSE");
-		return false;
-	}
-
-
-	// TODO use prefix tree
+	};
+	
 	public boolean isWord(List<Block> blocksTillNow) {
-		return isWord(Block.listToString(blocksTillNow));
+		return isWord(blocksTillNow, false);
+	}
+	
+	private boolean isWord(List<Block> blocksTillNow, boolean prefixAlsoGood) {
+		DictionaryNode currentNode = root;
+		for (int i=0; i < blocksTillNow.size(); i++) {
+			char currentChar = blocksTillNow.get(i).getLetter();
+			if (!currentNode.getChildren().containsKey(currentChar)) {
+				return false;
+			}
+			currentNode = currentNode.getChildren().get(currentChar);
+		}
+		
+		// Current node must be leaf
+		return prefixAlsoGood || currentNode.getChildren().isEmpty();
 	}
 
-	// TODO use prefix tree
 	public boolean isPrefix(List<Block> blocksTillNow) {
-		return isPrefix(Block.listToString(blocksTillNow));
+		return isWord(blocksTillNow, true);
 	}
 }

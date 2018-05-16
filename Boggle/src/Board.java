@@ -68,6 +68,7 @@ public class Board {
 		List<String> foundWords = new ArrayList<String>();
 		Set<Block> originBlocksProcessed = new HashSet<Block>();
 		Queue<Block> originBlocksToProcess = new LinkedList<Block>();
+		Dictionary dictionary = new Dictionary();
 		
 		// Cycle through each block
 		originBlocksToProcess.add(origin);
@@ -78,7 +79,7 @@ public class Board {
 			
 			List<Block> blocksTillNow = new ArrayList<Block>();
 			blocksTillNow.add(origin);
-			foundWords.addAll(findWords(blocksTillNow, new Dictionary()));
+			foundWords.addAll(findWords(blocksTillNow, dictionary));
 			
 			// Traverse the graph
 			originBlocksProcessed.add(origin);
