@@ -86,24 +86,24 @@ public class Board {
 			originBlocksToProcess.addAll(origin.getNeighbors());
 		}
 		
+		System.out.println("Found " + foundWords.size() + " words");
 		return foundWords;
 	}
 	
 	// Given the current chain of letters, return valid words
 	public List<String> findWords(List<Block> blocksTillNow, Dictionary dict) {
 		String currentString = Block.listToString(blocksTillNow);
-		System.out.println("Checking blocks till now: " + currentString);
 		
 		List<String> foundWords = new ArrayList<String>();
 		if (dict.isWord(blocksTillNow)) {
-			System.out.println("Found word: " + currentString);
-			foundWords.add(currentString);
+			if (currentString.length() > 3) {
+				foundWords.add(currentString);
+			}
 		}
 		if (dict.isPrefix(blocksTillNow)) {
 			// recurse with neighbors
 			Block last = blocksTillNow.get(blocksTillNow.size() - 1);
 			for (Block neighbor : last.getNeighbors()) {
-				System.out.println("Checking neighbor of " + last + ": " + neighbor);
 				// TODO don't copy list
 				List<Block> withNeighbor = new ArrayList<Block>(blocksTillNow);
 				withNeighbor.add(neighbor);

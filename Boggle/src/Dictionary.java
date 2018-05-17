@@ -2,7 +2,11 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class Dictionary {
 	
@@ -12,7 +16,19 @@ public class Dictionary {
 		// Empty root node, has 26 children
 		root = new DictionaryNode();
 		
+//		List<String> words = new ArrayList<String>();
+//		words.add("hello");
+//		words.add("hi");
+//		words.add("hip");
+//		words.add("grab");
+//		words.add("low");
+//		for (String word : words) {
+//			this.add(word);
+//		}
+//		System.out.println(this.toString());
+		
 		System.out.println("Getting all the words");
+		
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("/usr/share/dict/words"));
 			String word;
@@ -30,14 +46,15 @@ public class Dictionary {
 	
 	private void add(String word) {
 		DictionaryNode currentNode = root;
+		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < word.length(); i++) {
 			char currentChar = word.charAt(i);
 			DictionaryNode nextNode;
 			
-			// If char not in tree at current position, create it
+			// If char not in children of current position, create it
 			if (!currentNode.getChildren().containsKey(currentChar)) {
 				nextNode = new DictionaryNode(currentChar);
-				currentNode.addChild(currentChar);
+				currentNode.addChild(nextNode);
 			} else {
 				nextNode = currentNode.getChildren().get(currentChar);
 			}
@@ -45,27 +62,55 @@ public class Dictionary {
 			// Traverse
 			currentNode = nextNode;
 		}
+		// The current node is the end of the word
+		currentNode.setIsWord(true);
 	};
 	
 	public boolean isWord(List<Block> blocksTillNow) {
-		return isWord(blocksTillNow, false);
+		return pathExists(blocksTillNow, true);
 	}
 	
-	private boolean isWord(List<Block> blocksTillNow, boolean prefixAlsoGood) {
+	private boolean pathExists(List<Block> blocksTillNow, boolean mustBeLeaf) {
 		DictionaryNode currentNode = root;
 		for (int i=0; i < blocksTillNow.size(); i++) {
 			char currentChar = blocksTillNow.get(i).getLetter();
 			if (!currentNode.getChildren().containsKey(currentChar)) {
+//				System.out.println("Valid path: FALSE");
 				return false;
 			}
 			currentNode = currentNode.getChildren().get(currentChar);
 		}
 		
-		// Current node must be leaf
-		return prefixAlsoGood || currentNode.getChildren().isEmpty();
+		boolean isLeaf = currentNode.isWord();
+//		System.out.println("Valid path: TRUE, isLeaf: " + isLeaf);
+		
+		// For exact word match, current node must be leaf
+		return !mustBeLeaf || isLeaf;
 	}
 
 	public boolean isPrefix(List<Block> blocksTillNow) {
-		return isWord(blocksTillNow, true);
+		return pathExists(blocksTillNow, false);
 	}
+	
+	@Override
+	public String toString() {
+		HashSet<DictionaryNode> seen = new HashSet<DictionaryNode>();
+		Queue<DictionaryNode> toPrint = new LinkedList<DictionaryNode>();
+		toPrint.add(root);
+		StringBuilder builder = new StringBuilder();
+		while (!toPrint.isEmpty()) {
+			DictionaryNode node = toPrint.remove();
+			if (seen.contains(node)) continue;
+			
+			builder.append(node + " has children: ");
+			for (DictionaryNode child : node.getChildren().values()) {
+				builder.append(child);
+				toPrint.add(child);
+			}
+			builder.append("\n");
+		}
+		
+		return builder.toString();
+	}
+	
 }
