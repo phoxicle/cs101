@@ -46,7 +46,6 @@ public class Dictionary {
 	
 	private void add(String word) {
 		DictionaryNode currentNode = root;
-		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < word.length(); i++) {
 			char currentChar = word.charAt(i);
 			DictionaryNode nextNode;
@@ -70,22 +69,18 @@ public class Dictionary {
 		return pathExists(blocksTillNow, true);
 	}
 	
-	private boolean pathExists(List<Block> blocksTillNow, boolean mustBeLeaf) {
+	private boolean pathExists(List<Block> blocksTillNow, boolean wordOnly) {
 		DictionaryNode currentNode = root;
 		for (int i=0; i < blocksTillNow.size(); i++) {
 			char currentChar = blocksTillNow.get(i).getLetter();
 			if (!currentNode.getChildren().containsKey(currentChar)) {
-//				System.out.println("Valid path: FALSE");
 				return false;
 			}
 			currentNode = currentNode.getChildren().get(currentChar);
 		}
 		
-		boolean isLeaf = currentNode.isWord();
-//		System.out.println("Valid path: TRUE, isLeaf: " + isLeaf);
-		
 		// For exact word match, current node must be leaf
-		return !mustBeLeaf || isLeaf;
+		return !wordOnly || currentNode.isWord();
 	}
 
 	public boolean isPrefix(List<Block> blocksTillNow) {
