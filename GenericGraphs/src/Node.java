@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Set;
 
 public class Node {
@@ -19,5 +20,5 @@ public class Node {
 	public void setNeighbors(Set<Node> neighbors) {
 		this.neighbors = neighbors;
 	}
-
+	
 }

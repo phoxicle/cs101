@@ -14,6 +14,38 @@ public class Node {
 		value = string;
 	}
 	
+	public void printInorder() {
+		List<Node> inorder = this.inorder();
+		for (Node n : inorder) {
+			System.out.print(n.value + ", ");
+		}
+	}
+	public List<Node> inorder() {
+		return inorder(new LinkedList<Node>());
+	}
+	public List<Node> inorder(List<Node> sofar) {
+		if (this.left != null) this.left.inorder(sofar);
+		sofar.add(this);
+		if (this.right != null) this.right.inorder(sofar);
+		return sofar;
+	}
+	
+	public void printPreorder() {
+		List<Node> preorder = this.preorder();
+		for (Node n : preorder) {
+			System.out.print(n.value + ", ");
+		}
+	}
+	public List<Node> preorder() {
+		return preorder(new LinkedList<Node>());
+	}
+	public List<Node> preorder(List<Node> sofar) {
+		sofar.add(this);
+		if (this.left != null) this.left.preorder(sofar);
+		if (this.right != null) this.right.preorder(sofar);
+		return sofar;
+	}
+	
 	public void printLeftView() {
 		if (this.left != null) {
 			System.out.print(this.left.toString() + ", ");
@@ -62,9 +94,11 @@ public class Node {
 		Node[] firstLayer = new Node[80];
 		firstLayer[40] = this;
 		print(firstLayer, firstLayer.length / 4);
+		System.out.println();
 	}
 	
 	public void print(Node[] layer, int step) {
+		System.out.println();
 		Node[] nextLayer = new Node[layer.length];
 		
 		boolean moreNodes = false;
@@ -88,13 +122,12 @@ public class Node {
 			}
 		}
 		
-		System.out.println();
 		if (moreNodes) {
 			print(nextLayer, step / 3);
 		}
 	}
 
-	public Node findGCD(int i, int j) {
+	public Node findLCA(int i, int j) {
 		// Searching is linear, so expect linear solution.
 		
 		// Find i and j. Then find intersection of parents.
@@ -146,6 +179,47 @@ public class Node {
 		}
 		
 		return null;
+	}
+	
+	/*
+	 * Inorder: left, root, right
+	 * Preorder: root, left, right
+	 */
+	public static Node fromInorderAndPreorder(List<Node> inorder, List<Node> preorder) {
+		// preorder starts with root.
+		// Go through inorder until we hit the root.
+		if (preorder.size() == 0) {
+			return null;
+		}
+		Node rootVal = preorder.get(0);
+		Node root = new Node(rootVal.value);
+		
+		
+		List<Node> leftInorder = new LinkedList<Node>();
+		List<Node> rightInorder = new LinkedList<Node>();
+		boolean hitRootInorderYet = false;
+		for (int i=0; i < inorder.size(); i++) {
+			// Everything before goes in left, everything after in right.
+			if (inorder.get(i) == rootVal) {
+				hitRootInorderYet = true;
+			} else if (!hitRootInorderYet) {
+				leftInorder.add(inorder.get(i));
+			} else {
+				rightInorder.add(inorder.get(i));
+			}
+		}
+		
+		// Everything in left inorder should also be in left preorder.
+		// Don't include root
+		List<Node> leftPreorder = preorder.subList(1, leftInorder.size() + 1);
+		List<Node> rightPreorder = preorder.subList(leftInorder.size() + 1, preorder.size());
+		
+		// recurse
+		root.left = fromInorderAndPreorder(leftInorder, leftPreorder);
+		root.right = fromInorderAndPreorder(rightInorder, rightPreorder);
+		
+		return root;
+		
 	}
 
 }

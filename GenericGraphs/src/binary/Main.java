@@ -23,6 +23,12 @@ public class Main {
 		//bst.printLeftView();
 		
 		// setup regular tree
+		/*
+		 *             4
+		 *       -5         9
+		 *    10    6     1
+		 *         7
+		 */
 		Node tree = new Node(4);
 		tree.left = new Node(-5);
 		tree.right = new Node(9);
@@ -31,9 +37,15 @@ public class Main {
 		tree.right.left = new Node(1);
 		tree.left.right.left = new Node(7);
 		tree.print();
+		System.out.println("Inorder: ");
+		tree.printInorder();
+		System.out.println("\nPreorder: ");
+		tree.printPreorder();
+		Node fromInorderAndPreorder = tree.fromInorderAndPreorder(tree.inorder(), tree.preorder());
+		fromInorderAndPreorder.print();
 
-		// Find GCDs
-		System.out.println("GCD was: " + tree.findGCD(7, 1));
+		// Find LCAs
+		//System.out.println("LCA was: " + tree.findLCA(7, 1));
 	}
 	
 
