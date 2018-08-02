@@ -19,10 +19,6 @@ public class LRUCache implements Cache {
 	
 	public LRUCache() {
 	}
-	
-	public LRUCache(int _maxSize) {
-		maxSize = _maxSize;
-	}
 
 	/**
 	 * Get value from cache.
@@ -42,9 +38,12 @@ public class LRUCache implements Cache {
 	public void set(String key, Object value) {
 		/* 
 		 * If we will just overwrite the key, no need to remove.
+		 * 
 		 * Make synchronized in case multiple threads are checking the same
 		 * missing value, so that they don't both scan the whole map + remove + write.
-		 * (helps prevent cache miss storm)
+		 * (helps prevent cache miss storm). 
+		 * If threads are accessing different object instances, we need to make this static.
+		 * 
 		 * @TODO unit test with concurrency
 		 */
 		synchronized(this) {
@@ -62,12 +61,12 @@ public class LRUCache implements Cache {
 	private void removeLRUEntry() {
 		// Scan through entire map, check last access time
 		String lruKey = null;
-		long lruDate = System.nanoTime();
+		long lruTime = System.nanoTime();
 		for (Map.Entry<String, CacheObject> entry : map.entrySet()) {
 			long lastAccess = entry.getValue().getLastAccess();
-			if (lastAccess < lruDate) {
+			if (lastAccess < lruTime) {
 				lruKey = entry.getKey();
-				lruDate = lastAccess;
+				lruTime = lastAccess;
 			}
 		};
 		

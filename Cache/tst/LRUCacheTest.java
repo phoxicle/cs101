@@ -26,7 +26,6 @@ class LRUCacheTest {
 	
 	@Test
 	void lruCache_settingSameKey_overridesValue() {
-		cache.setMaxSize(2);
 		cache.set("a", "A");
 		cache.set("a", "A2");
 		assertEquals("A2", cache.get("a"));
